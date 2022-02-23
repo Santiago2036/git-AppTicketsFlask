@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from flask_mysqldb import MySQL
 from config import config
+from index import menu
 
 
 
@@ -12,23 +13,28 @@ app.config['MYSQL_PASSWORD']='2036'
 app.config['MYSQL_DB']='tickets'
 conexion=MySQL(app)
 
+redireccion=menu()
+
 @app.route('/')
 def inicio():
-    return render_template('creacionTicket.html')
 
-@app.route("/recuperaRegistros")##ENLISTA TODOS LOS TICKETS
+    return render_template(redireccion)
+
+@app.route("/recuperaRegistros",methods=['POST'])##ENLISTA TODOS LOS TICKETS
 def listar_tiquetes():
-        cur= conexion.connection.cursor()
-        cur.execute('SELECT * FROM registrotiquetes ')
-        conexion.connection.commit()
+        if request.method== 'POST':
+            cur= conexion.connection.cursor()
+            cur.execute('SELECT * FROM registrotiquetes ')
+            conexion.connection.commit()
 
-        datos=cur.fetchall()
-        lista_Datos=list(datos)
-        for i in lista_Datos:
-            print("TICKET ENLISTADO")
-            print(i ,end="\n")
+            datos=cur.fetchall()
+            lista_Datos=list(datos)
+            for i in lista_Datos:
+                print("TICKET ENLISTADO")
+                print(i ,end="\n")
 
-        return "TICKETS ENLISTADOS!!"
+            return "TICKETS ENLISTADOS!!"
+
 
 @app.route("/consulta_ticket", methods=['POST'])##ENLISTA 1 TICKET ESPECIFICADO POR EL USUARIO
 def consulta_tiquetes():
